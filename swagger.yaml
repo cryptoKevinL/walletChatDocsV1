@@ -1,0 +1,1380 @@
+definitions:
+  auth.Authuser:
+    properties:
+      address:
+        type: string
+      nonce:
+        type: string
+    type: object
+  auth.SigninPayload:
+    properties:
+      address:
+        type: string
+      nonce:
+        type: string
+      sig:
+        type: string
+    type: object
+  controllers.Attachments:
+    properties:
+      media_keys:
+        items:
+          type: string
+        type: array
+    type: object
+  controllers.LandingPageItems:
+    properties:
+      has_messaged:
+        description: has user messaged in this group chat before? if not show "Say
+          hi" button
+        type: boolean
+      is_verified:
+        description: is this group verified? WalletChat's group is verified by default
+        type: boolean
+      joined:
+        description: number of members of the group
+        type: boolean
+      logo:
+        description: logo url, stored in backend
+        type: string
+      members:
+        type: integer
+      messages:
+        items:
+          $ref: '#/definitions/entity.Groupchatitem'
+        type: array
+      name:
+        type: string
+      social:
+        items:
+          $ref: '#/definitions/controllers.SocialMsg'
+        type: array
+      tweets:
+        description: follow format of GET /get_twitter/{nftAddr}
+        items:
+          $ref: '#/definitions/controllers.TweetType'
+        type: array
+    type: object
+  controllers.SocialMsg:
+    properties:
+      type:
+        type: string
+      username:
+        type: string
+    type: object
+  controllers.TweetType:
+    properties:
+      attachments:
+        properties:
+          media_keys:
+            items:
+              type: string
+            type: array
+        type: object
+      author_id:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      media:
+        $ref: '#/definitions/controllers.Attachments'
+      text:
+        type: string
+      user:
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          profile_image_url:
+            type: string
+          username:
+            type: string
+        type: object
+    type: object
+  entity.Addrnameitem:
+    properties:
+      address:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  entity.Bookmarkitem:
+    properties:
+      chain:
+        type: string
+      id:
+        type: integer
+      nftaddr:
+        type: string
+      walletaddr:
+        type: string
+    type: object
+  entity.Chatitem:
+    properties:
+      fromaddr:
+        description: '*** REQUIRED INPUT ***'
+        type: string
+      id:
+        description: AUTO-GENERATED (PRIMARY KEY)
+        type: integer
+      message:
+        description: '*** REQUIRED INPUT ***'
+        type: string
+      nftaddr:
+        description: ONLY USED FOR NFT DM CONTEXT
+        type: string
+      nftid:
+        description: ONLY USED FOR NFT DM CONTEXT
+        type: string
+      read:
+        description: DEFAULT FALSE
+        type: boolean
+      sender_name:
+        description: AUTO-SET BY BACKED FOR RETURN VALUE
+        type: string
+      timestamp:
+        description: AUTO-SET BY REST API
+        type: string
+      timestamp_dtm:
+        description: USED FOR SORTING WHEN TIME FORMAT NEEDED
+        type: string
+      toaddr:
+        description: '*** REQUIRED INPUT ***'
+        type: string
+    required:
+    - fromaddr
+    - message
+    - toaddr
+    type: object
+  entity.Chatiteminbox:
+    description: Used as Return Data Struct Only
+    properties:
+      chain:
+        type: string
+      context_type:
+        type: string
+      fromaddr:
+        type: string
+      id:
+        type: integer
+      logo:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      nftaddr:
+        type: string
+      nftid:
+        type: string
+      read:
+        type: boolean
+      sender_name:
+        type: string
+      timestamp:
+        type: string
+      timestamp_dtm:
+        type: string
+      toaddr:
+        type: string
+      type:
+        type: string
+      unread:
+        type: integer
+    type: object
+  entity.Comments:
+    properties:
+      fromaddr:
+        type: string
+      id:
+        type: integer
+      message:
+        type: string
+      name:
+        type: string
+      nftaddr:
+        type: string
+      nftid:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  entity.Groupchatitem:
+    properties:
+      context_type:
+        type: string
+      fromaddr:
+        type: string
+      id:
+        type: integer
+      message:
+        type: string
+      nftaddr:
+        type: string
+      sender_name:
+        type: string
+      timestamp:
+        type: string
+      timestamp_dtm:
+        type: string
+      type:
+        type: string
+    type: object
+  entity.Imageitem:
+    properties:
+      base64data:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  entity.Settings:
+    properties:
+      id:
+        type: integer
+      publickey:
+        description: need this for encryption, don't want to get it over and over
+        type: string
+      walletaddr:
+        type: string
+    type: object
+host: restwalletchat-app-sey3k.ondigitalocean.app
+info:
+  contact:
+    email: walletchatextension@gmail.com
+    url: https://walletchat.fun
+  description: |-
+    Wecome to the WalletChat API Documentation
+
+    Please make note that some JSON data structures are shared for both input/output.
+    Required input parameters will have a red * next to them in the data type outline at
+    the bottom of the page, along with a comment.  This means when executing API functionality
+    from this API page, some fields may need to be removed from the JSON struct before submitting.
+    Please email the developers with any issues.
+    Some JSON data structures are output only, and will be marked as such as well.
+
+    v0 of the API does not include encryption or authentication.  Please as you are given access
+    to this page, do not abuse this system and impersonate others, or submit offensive material.
+    developers monitor this data daily.
+
+    v1 will include encyrption for DMs, private keys will be stored locally on client PCs
+    with no way for us to recover any data which is encrypted.
+
+    v1 will also include basic JWT Authentication, however some more work to make this fully secure
+    will be needed and included in v2.
+  title: WalletChat API
+  version: "1.0"
+paths:
+  /community:
+    post:
+      consumes:
+      - application/json
+      description: Community Chat Data
+      parameters:
+      - description: Community Message Chat Data
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Groupchatitem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Groupchatitem'
+            type: array
+      summary: CreateCommunityChatitem creates GroupChatitem just with community tag
+        (likely could be consolidated)
+      tags:
+      - GroupChat
+  /community/{community}/{address}:
+    get:
+      consumes:
+      - application/json
+      description: 'TODO: need a creation API for communities, which includes specificied
+        welcome message text, Twitter handle, page title'
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      - description: Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.LandingPageItems'
+            type: array
+      summary: Get Community Chat Landing Page Info
+      tags:
+      - GroupChat
+  /create_bookmark:
+    post:
+      consumes:
+      - application/json
+      description: Bookmarks keep an NFT/Community group chat in the sidebar
+      parameters:
+      - description: Add Bookmark from Community Group Chat
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Bookmarkitem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Bookmarkitem'
+            type: array
+      summary: Join an NFT or Community group chat
+      tags:
+      - GroupChat
+  /create_chatitem:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        For DMs, Chatitem data struct is used to store each message and associated info.
+        REQUIRED: fromaddr, toaddr, message (see data struct section at bottom of page for more detailed info on each paramter)
+        Other fields are generally filled in by the backed REST API and used as return parameters
+        ID is auto generated and should never be used as input.
+      parameters:
+      - description: Direct Message Chat Data
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Chatitem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Chatitem'
+            type: array
+      summary: Create/Insert DM Chat Message (1-to-1 messaging)
+      tags:
+      - DMs
+  /create_comments:
+    post:
+      consumes:
+      - application/json
+      description: Comments are meant to be public, someday having an up/downvote
+        method for auto-moderation
+      parameters:
+      - description: create struct
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Comments'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Comments'
+            type: array
+      summary: Comments are used within an NFT community chat
+      tags:
+      - NFT
+  /create_groupchatitem:
+    post:
+      consumes:
+      - application/json
+      description: Currently used for all messages outside of DMs
+      parameters:
+      - description: Group Message Chat Data
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Groupchatitem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Groupchatitem'
+            type: array
+      summary: Create/Insert chat message for Community/NFT/Group Messaging
+      tags:
+      - GroupChat
+  /create_settings:
+    post:
+      consumes:
+      - application/json
+      description: Currently this only updates the public key, could be expanded as
+        needed.
+      parameters:
+      - description: update struct
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Settings'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Settings'
+            type: array
+      summary: Settings hold a user address and the public key used for encryption.
+      tags:
+      - Common
+  /delete_bookmark:
+    post:
+      consumes:
+      - application/json
+      description: Bookmarks keep an NFT/Community group chat in the sidebar
+      parameters:
+      - description: Remove Bookmark from Community Group Chat
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Bookmarkitem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Bookmarkitem'
+            type: array
+      summary: Leave an NFT or Community group chat
+      tags:
+      - GroupChat
+  /delete_comments/{fromaddr}/{nftaddr}/{nftid}:
+    delete:
+      consumes:
+      - application/json
+      description: NFTs have a public comment section
+      parameters:
+      - description: FROM Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      - description: NFT Contract Address
+        in: path
+        name: nftaddr
+        required: true
+        type: string
+      - description: NFT ID
+        in: path
+        name: nftid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Delete Public Comments for given FROM wallet address, NFT Contract
+        and ID
+      tags:
+      - NFT
+  /delete_settings/{address}:
+    delete:
+      consumes:
+      - application/json
+      description: 'TODO: Need to protect this with JWT in addition to other API calls
+        needed to use FROM addr from the JWT'
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Delete Settings Info
+      tags:
+      - Unused/Legacy
+  /deleteall_chatitems/{fromaddr}/{toaddr}:
+    delete:
+      consumes:
+      - application/json
+      description: 'TODO: Need to protect this with JWT in addition to other API calls
+        needed to use FROM addr from the JWT'
+      parameters:
+      - description: 'TO: Address'
+        in: path
+        name: toaddr
+        required: true
+        type: string
+      - description: 'FROM: Address'
+        in: path
+        name: fromaddr
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Delete All Chat Items (DMs) between FROM and TO given addresses
+      tags:
+      - Unused/Legacy
+  /get_bookmarks/{address}/:
+    get:
+      consumes:
+      - application/json
+      description: This used for UI purposes, checking if a user/wallet has bookmarked
+        a community.
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Bookmarkitem'
+            type: array
+      summary: Check if a wallet address has bookmarked/joined given NFT contract
+      tags:
+      - GroupChat
+  /get_bookmarks/{walletaddr}/{nftaddr}:
+    get:
+      consumes:
+      - application/json
+      description: This used for UI purposes, checking if a user/wallet has bookmarked
+        a community.
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: walletaddr
+        required: true
+        type: string
+      - description: NFT Contract Address
+        in: path
+        name: nftaddr
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: bool
+      summary: Check if a wallet address has bookmarked/joined given NFT contract
+      tags:
+      - GroupChat
+  /get_comments/{nftaddr}/{nftid}:
+    get:
+      consumes:
+      - application/json
+      description: NFTs have a public comment section
+      parameters:
+      - description: NFT Contract Address
+        in: path
+        name: nftaddr
+        required: true
+        type: string
+      - description: NFT ID
+        in: path
+        name: nftid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get Public Comments Count for given NFT Contract and ID
+      tags:
+      - NFT
+  /get_groupchatitems/{address}:
+    get:
+      consumes:
+      - application/json
+      description: Community Chat Data
+      parameters:
+      - description: Get Group Chat Data By NFT Address
+        in: path
+        name: message
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Groupchatitem'
+            type: array
+      summary: GetGroupChatItems gets group chat data for a given NFT address
+      tags:
+      - NFT
+  /get_groupchatitems/{address}/{useraddress}:
+    get:
+      consumes:
+      - application/json
+      description: 'Get all group chat items for a given wallet (useraddress) for
+        a given NFT Contract Address (TODO: fix up var names)'
+      parameters:
+      - description: NFT Address
+        in: path
+        name: address
+        required: true
+        type: string
+      - description: 'FROM: wallet address'
+        in: path
+        name: useraddress
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Groupchatitem'
+            type: array
+      summary: Get group chat items, given a wallt FROM address and NFT Contract Address
+      tags:
+      - NFT
+  /get_groupchatitems_unreadcnt/{address}/{useraddress}:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        For group chat unread counts, currently the database stores a timestamp for each time a user enters a group chat.
+        We though in the design it would be impractical to keep a read/unread count copy per user per message, but if this
+        method doesn't proof to be fine grained enough, we could add a boolean relational table of read messgages per user.
+      parameters:
+      - description: Common Name Mapped to User/Community
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: 'Get Unread Groupchat Items (TODO: cleanup naming convention here)'
+      tags:
+      - Common
+  /get_inbox/{address}:
+    get:
+      consumes:
+      - application/json
+      description: Get Each 1-on-1 Conversation, NFT and Community Chat For Display
+        in Inbox
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Chatiteminbox'
+            type: array
+      summary: Get Inbox Summary With Last Message
+      tags:
+      - Inbox
+  /get_settings/{address}:
+    get:
+      consumes:
+      - application/json
+      description: 'TODO: Need to protect this with JWT in addition to other API calls
+        needed to use FROM addr from the JWT'
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Settings'
+            type: array
+      summary: Get Settings Info
+      tags:
+      - Unused/Legacy
+  /get_unread_cnt/{address}:
+    get:
+      consumes:
+      - application/json
+      description: Get Each 1-on-1 Conversation, NFT and Community Chat For Display
+        in Inbox
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get all unread messages TO a specific user, used for total count notification
+        at top notification bar
+      tags:
+      - Inbox
+  /get_unread_cnt/{address}/{nftaddr}/{nftid}:
+    get:
+      consumes:
+      - application/json
+      description: Get Unread count for specifc NFT context given a wallet address
+        and specific NFT
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      - description: NFT Contract Address
+        in: path
+        name: nftaddr
+        required: true
+        type: string
+      - description: NFT ID
+        in: path
+        name: nftid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get all unread messages for a specific NFT context
+      tags:
+      - NFT
+  /get_unread_cnt/{fromaddr}/{toaddr}:
+    get:
+      consumes:
+      - application/json
+      description: Get Unread count for DMs
+      parameters:
+      - description: 'TO: Wallet Address'
+        in: path
+        name: toaddr
+        required: true
+        type: string
+      - description: 'FROM: Wallet Address'
+        in: path
+        name: from
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get all unread messages between two addresses
+      tags:
+      - Unused/Legacy
+  /get_unread_cnt_by_type/{address}/{type}:
+    get:
+      consumes:
+      - application/json
+      description: Get Each 1-on-1 Conversation, NFT and Community Chat For Display
+        in Inbox
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      - description: Message Type - nft|community|dm|all
+        in: path
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get all unread messages TO a specific user, used for total count notification
+        at top notification bar
+      tags:
+      - Unused/Legacy
+  /get_unread_cnt_nft/{address}:
+    get:
+      consumes:
+      - application/json
+      description: Get Unread count for all NFT contexts given a wallet address
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get all unread messages for all NFT related chats for given user
+      tags:
+      - Unused/Legacy
+  /getall_chatitems/{address}:
+    get:
+      consumes:
+      - application/json
+      description: Get all Chat Items for DMs for a given wallet address
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: toaddr
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Chatitem'
+            type: array
+      summary: Get Chat Item For Given Wallet Address
+      tags:
+      - Unused/Legacy
+  /getall_chatitems/{fromaddr}/{toaddr}:
+    get:
+      consumes:
+      - application/json
+      description: Get chat data between the given two addresses, TO and FROM and
+        interchangable here
+      parameters:
+      - description: 'TO: Wallet Address'
+        in: path
+        name: toaddr
+        required: true
+        type: string
+      - description: 'FROM: Wallet Address'
+        in: path
+        name: from
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Chatitem'
+            type: array
+      summary: Get Chat Data Between Two Addresses
+      tags:
+      - DMs
+  /getnft_chatitems/{address}:
+    get:
+      consumes:
+      - application/json
+      description: Get ALL NFT context items for a given wallet address
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: toaddr
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Chatitem'
+            type: array
+      summary: Get NFT Related Chat Items For Given Wallet Address
+      tags:
+      - Unused/Legacy
+  /getnft_chatitems/{address}/{nftaddr}/{nftid}:
+    get:
+      consumes:
+      - application/json
+      description: Get all specified NFT contract and ID items for a given wallet
+        address
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      - description: NFT Contract Address
+        in: path
+        name: nftaddr
+        required: true
+        type: string
+      - description: NFT ID
+        in: path
+        name: nftid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Chatitem'
+            type: array
+      summary: Get NFT Related Chat Items For Given NFT Contract and ID, relating
+        to one wallet
+      tags:
+      - Unused/Legacy
+  /getnft_chatitems/{fromaddr}/{toaddr}/{nftaddr}/{nftid}:
+    get:
+      consumes:
+      - application/json
+      description: Get ALL NFT context items for a specifc NFT context convo between
+        two wallets
+      parameters:
+      - description: NFT Contract Address
+        in: path
+        name: nftaddr
+        required: true
+        type: string
+      - description: NFT ID
+        in: path
+        name: nftid
+        required: true
+        type: string
+      - description: 'TO: Wallet Address'
+        in: path
+        name: toaddr
+        required: true
+        type: string
+      - description: 'FROM: Wallet Address'
+        in: path
+        name: from
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Chatitem'
+            type: array
+      summary: Get NFT Related Chat Items For Given NFT Contract and ID, between two
+        wallet addresses (TO and FROM are interchangable)
+      tags:
+      - NFT
+  /getnft_chatitems/{nftaddr}/{nftid}:
+    get:
+      consumes:
+      - application/json
+      description: Get ALL NFT context items for a given wallet address
+      parameters:
+      - description: NFT Contract Address
+        in: path
+        name: nftaddr
+        required: true
+        type: string
+      - description: NFT ID
+        in: path
+        name: nftid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Chatitem'
+            type: array
+      summary: Get NFT Related Chat Items For Given NFT Contract and ID
+      tags:
+      - Unused/Legacy
+  /image:
+    post:
+      consumes:
+      - application/json
+      description: Currently used for the WC HQ Logo, stores the base64 raw data of
+        the profile image for a community
+      parameters:
+      - description: Profile Thumbnail Pic
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Imageitem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Bookmarkitem'
+            type: array
+      summary: Store Image in DB for later user
+      tags:
+      - Common
+    put:
+      consumes:
+      - application/json
+      description: Currently used for the WC HQ Logo, stores the base64 raw data of
+        the profile image for a community
+      parameters:
+      - description: Profile Thumbnail Pic
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Imageitem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Bookmarkitem'
+            type: array
+      summary: Store Image in DB for later user (update existing photo)
+      tags:
+      - Common
+  /image/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Retreive image data for use with user/community/nft group dislayed
+        icon
+      parameters:
+      - description: Common Name Mapped to User/Community
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Imageitem'
+            type: array
+      summary: Get Thumbnail Image Data
+      tags:
+      - Common
+  /is_owner/{contract}/{wallet}:
+    get:
+      consumes:
+      - application/json
+      description: API user could check this directly via any third party service
+        like NFTPort, Moralis as well
+      parameters:
+      - description: NFT Contract Address
+        in: path
+        name: contract
+        required: true
+        type: string
+      - description: Wallet Address
+        in: path
+        name: wallet
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.LandingPageItems'
+            type: array
+      summary: Check if given wallet address owns an NFT from given contract address
+      tags:
+      - Common
+  /name:
+    post:
+      consumes:
+      - application/json
+      description: Give a common name (Kevin.eth, BillyTheKid, etc) to an Address
+      parameters:
+      - description: Address and Name to map together
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Addrnameitem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Bookmarkitem'
+            type: array
+      summary: give a common name to a user address, or NFT collection
+      tags:
+      - Common
+    put:
+      consumes:
+      - application/json
+      description: Give a common name (Kevin.eth, BillyTheKid, etc) to an Address
+      parameters:
+      - description: Address and Name to map together
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Addrnameitem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Bookmarkitem'
+            type: array
+      summary: give a common name to a user address, or NFT collection (update exiting)
+      tags:
+      - Common
+  /name/{name}:
+    get:
+      consumes:
+      - application/json
+      description: get the given a common name (Kevin.eth, BillyTheKid, etc) what
+        has already been mapped to an Address
+      parameters:
+      - description: Get Name for given address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Addrnameitem'
+            type: array
+      summary: get the common name which has been mapped to an address
+      tags:
+      - Common
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        This is a one-time operation, maybe could be combined into the nonce-generating call.  Basically places a wallet address
+        into the database for further use.  Only the "address" field is needed for input here in the AuthUser struct.
+      parameters:
+      - description: address input in json format
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/auth.Authuser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Register Wallet Address for the first time, one-time operation
+      tags:
+      - Auth
+  /signin:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Every call the to API after this signin should present the JWT Bearer token for authenticated access.
+        Upon request we can change the timeout to greater than 24 hours, or setup an addtional dedicated API for
+        an agreed upon development and maintenance cost.
+      parameters:
+      - description: json input containing signed nonce
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SigninPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Sign In with signed nonce value, currently JWT token returned should
+        be valid for 24 hours
+      tags:
+      - Auth
+  /unreadcount/{address}:
+    get:
+      consumes:
+      - application/json
+      description: Get Unread count just given an address
+      parameters:
+      - description: Wallet Address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get all unread messages TO a specific user, used for total count notification
+        at top notification bar
+      tags:
+      - Inbox
+  /update_chatitem/{fromaddr}/{toaddr}:
+    put:
+      consumes:
+      - application/json
+      description: |-
+        Currently this only update the message read/unread status.  It could update the entire JSON struct
+        upon request, however we only needed this functionality currently and it saved re-encryption of the data.
+        TODO: TO/FROM address in the URL is not needed/not used anymore.
+      parameters:
+      - description: chat item JSON struct to update msg read status
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Chatitem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Chatitem'
+            type: array
+      summary: Update Message Read Status of a given DM chat message
+      tags:
+      - DMs
+  /update_settings:
+    put:
+      consumes:
+      - application/json
+      description: Currently this only updates the public key, could be expanded as
+        needed.
+      parameters:
+      - description: update struct
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Settings'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Settings'
+            type: array
+      summary: Settings hold a user address and the public key used for encryption.
+      tags:
+      - Common
+  /users/{address}/nonce:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        As part of the login process, we need a user to sign a nonce genrated from the API, to prove the user in fact
+        the owner of the wallet they are siging in from.  JWT currently set to 24 hour validity (could change this upon request)
+      parameters:
+      - description: wallet address to get nonce to sign
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: ""
+      summary: If the current wallet doesn't have a valid local JWT, need to request
+        a new nonce to sign
+swagger: "2.0"
